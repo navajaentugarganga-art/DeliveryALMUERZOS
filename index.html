@@ -1,76 +1,506 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delivery Almuerzos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🍴 Delivery Almuerzos - Pedidos</title>
+    
     <style>
-        body {
-            font-family: 'Arial', sans-serif; 
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to right, #f7f8f8, #e9e9e9);
+        :root { 
+            --primary: #2E7D32; 
+            --secondary: #FF5722; 
+            --bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --whatsapp: #25D366; 
+            --status: #0288D1; 
         }
-        header {
-            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 15px 15px 100px 15px;
+        }
+        
+        .container { 
+            max-width: 500px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, #1B5E20 100%);
+            padding: 25px;
+            border-radius: 15px;
             color: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: background 0.5s ease;
+            box-shadow: 0 5px 15px rgba(46,125,50,0.2);
         }
-        header:hover {
-            background: linear-gradient(90deg, #8f94fb, #4e54c8);
+        
+        .logo { 
+            font-size: 36px; 
+            font-weight: bold; 
+            margin-bottom: 10px;
+            animation: bounce 2s infinite;
         }
-        .card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            margin: 20px;
-            padding: 15px;
-            transition: transform 0.2s;
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        
+        .tagline { 
+            color: rgba(255,255,255,0.9); 
+            font-size: 14px;
+            font-style: italic;
         }
-        .btn {
-            background: #4e54c8;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
+        
+        .banner-semanal { 
+            background: linear-gradient(135deg, var(--primary) 0%, #1B5E20 100%);
+            color: white; 
+            padding: 14px; 
+            border-radius: 12px; 
+            text-align: center; 
+            cursor: pointer; 
+            font-weight: bold; 
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(46,125,50,0.2);
+        }
+        
+        .banner-semanal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(46,125,50,0.3);
+        }
+        
+        #lista-semanal { 
+            display: none; 
+            background: #f1f8e9; 
+            padding: 15px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            border: 2px dashed var(--primary); 
+            font-size: 14px;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        #lista-semanal ul { list-style: none; }
+        #lista-semanal li { 
+            padding: 8px 0; 
+            border-bottom: 1px solid #e0e0e0;
+        }
+        #lista-semanal li:last-child { border-bottom: none; }
+        
+        .menu-card { 
+            border: 2px solid #f0f0f0; 
+            padding: 16px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(135deg, #fdfdfd 0%, #f9f9f9 100%);
+            transition: all 0.3s;
             cursor: pointer;
-            transition: background 0.3s;
         }
-        .btn:hover {
-            background: #8f94fb;
+        
+        .menu-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 20px rgba(46,125,50,0.15);
+            transform: translateY(-3px);
         }
-        footer {
-            text-align: center;
-            margin: 20px 0;
+        
+        .menu-info h3 { 
+            margin: 0 0 8px 0; 
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .menu-info p { 
+            color: var(--primary); 
+            font-weight: bold;
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .qty-input { 
+            width: 70px; 
+            padding: 12px; 
+            border-radius: 10px; 
+            border: 2px solid #ddd; 
+            text-align: center; 
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .qty-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(46,125,50,0.2);
+        }
+
+        .form-group { margin-top: 22px; }
+        
+        .form-group label { 
+            font-weight: bold; 
+            font-size: 15px; 
+            display: block; 
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        input[type="text"], textarea { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 10px; 
+            border: 2px solid #e0e0e0; 
+            box-sizing: border-box; 
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(46,125,50,0.15);
+            background: #f9fff7;
+        }
+        
+        .payment-methods { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .pay-option { flex: 1; min-width: 80px; }
+        .pay-option input { display: none; }
+        
+        .pay-option label { 
+            padding: 12px 8px; 
+            background: #f5f5f5; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            display: block; 
+            text-align: center; 
+            font-size: 13px; 
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .pay-option label:hover {
+            background: #efefef;
+        }
+        
+        .pay-option input:checked + label { 
+            background: linear-gradient(135deg, var(--primary) 0%, #1B5E20 100%);
+            border-color: var(--primary); 
+            color: white; 
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(46,125,50,0.2);
+        }
+
+        /* Botones de Acción */
+        .btn-order { 
+            background: linear-gradient(135deg, var(--secondary) 0%, #E64A19 100%);
+            color: white; 
+            border: none; 
+            width: 100%; 
+            padding: 18px; 
+            font-size: 18px; 
+            font-weight: bold;
+            border-radius: 12px; 
+            cursor: pointer; 
+            margin-top: 28px;
+            box-shadow: 0 6px 20px rgba(255,87,34,0.3);
+            transition: all 0.3s;
+        }
+        
+        .btn-order:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255,87,34,0.4);
+        }
+        
+        .btn-order:active {
+            transform: translateY(0);
+        }
+        
+        .btn-status { 
+            background: white; 
+            color: var(--status); 
+            border: 2px solid var(--status); 
+            width: 100%; 
+            padding: 14px; 
+            font-size: 16px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            margin-top: 15px; 
+            font-weight: bold; 
+            transition: all 0.3s;
+        }
+        
+        .btn-status:hover {
+            background: var(--status);
+            color: white;
+            box-shadow: 0 6px 15px rgba(2,136,209,0.3);
+        }
+
+        .btn-support { 
+            position: fixed; 
+            bottom: 25px; 
+            right: 25px; 
+            background: var(--whatsapp); 
+            color: white; 
+            width: 65px; 
+            height: 65px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 32px; 
+            text-decoration: none; 
+            box-shadow: 0 6px 25px rgba(37,211,102,0.4);
+            z-index: 100;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .btn-support:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 35px rgba(37,211,102,0.5);
+        }
+        
+        #modal-confirm, #overlay { display: none; }
+        
+        #overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.7); 
+            z-index: 999;
+            animation: fadeIn 0.3s;
+        }
+        
+        #modal-confirm { 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%);
+            background: white; 
+            padding: 40px; 
+            border-radius: 25px; 
+            z-index: 1000; 
+            text-align: center; 
+            width: 85%; 
+            max-width: 350px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: popUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        @keyframes popUp {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        #modal-confirm h2 { color: var(--primary); margin: 15px 0; }
+        
+        .btn-admin-link { 
+            background: none; 
+            border: none; 
+            color: #999; 
+            font-size: 12px; 
+            margin-top: 40px; 
+            cursor: pointer; 
+            text-decoration: underline; 
+            width: 100%;
+            transition: color 0.3s;
+        }
+        
+        .btn-admin-link:hover {
+            color: var(--primary);
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to Delivery Almuerzos</h1>
-        <p>Your place for delicious meals!</p>
-    </header>
-    <div class="cards">
-        <div class="card">
-            <h2>Meal of the Day</h2>
-            <p>Enjoy our special meal crafted just for you!</p>
-            <button class="btn">Order Now</button>
+
+<div class="container">
+    <div class="header">
+        <div class="logo">🍴 Delivery Almuerzos</div>
+        <div class="tagline">"Sabor casero directo a tu puerta"</div>
+    </div>
+
+    <div class="banner-semanal" onclick="toggleMenuSemanal()">📅 VER MENÚ DE LA SEMANA</div>
+    <div id="lista-semanal"></div>
+
+    <div class="menu-card">
+        <div class="menu-info">
+            <h3 id="nombre-menu-dia">Cargando...</h3>
+            <p>$18.000 COP</p>
         </div>
-        <div class="card">
-            <h2>Custom Meals</h2>
-            <p>Create your meal with our easy meal builder!</p>
-            <button class="btn">Build Your Meal</button>
+        <input type="number" id="cant-dia" class="qty-input" value="0" min="0" inputmode="numeric">
+    </div>
+
+    <div class="menu-card">
+        <div class="menu-info">
+            <h3>Menú Ejecutivo Especial</h3>
+            <p>$20.000 COP</p>
+        </div>
+        <input type="number" id="cant-ejecutivo" class="qty-input" value="0" min="0" inputmode="numeric">
+    </div>
+
+    <div class="form-group">
+        <label>📍 Dirección de Entrega:</label>
+        <input type="text" id="direccion" placeholder="Ej: Calle 10 #4-20, Apto 302">
+    </div>
+
+    <div class="form-group">
+        <label>💳 Método de Pago:</label>
+        <div class="payment-methods">
+            <div class="pay-option">
+                <input type="radio" id="p-efe" name="pago" value="Efectivo" checked>
+                <label for="p-efe">💵 Efectivo</label>
+            </div>
+            <div class="pay-option">
+                <input type="radio" id="p-neq" name="pago" value="Nequi">
+                <label for="p-neq">🟣 Nequi</label>
+            </div>
+            <div class="pay-option">
+                <input type="radio" id="p-dav" name="pago" value="Daviplata">
+                <label for="p-dav">🔴 Daviplata</label>
+            </div>
         </div>
     </div>
-    <footer>
-        <p>&copy; 2026 Delivery Almuerzos</p>
-    </footer>
+
+    <div class="form-group">
+        <label>📝 Notas (Opcional):</label>
+        <textarea id="notas" rows="2" placeholder="Sin cebolla, cambio de 50k, etc..."></textarea>
+    </div>
+
+    <button class="btn-order" onclick="enviarPedido()">🚀 ORDENAR AHORA</button>
+    <button class="btn-status" onclick="consultarEstado()">🔍 ¿Cómo va mi pedido?</button>
+    <button class="btn-admin-link" onclick="accesoAdmin()">⚙️ Administración</button>
+</div>
+
+<a href="https://wa.me/573219473080?text=Hola,%20tengo%20una%20pregunta" class="btn-support" target="_blank">💬</a>
+
+<div id="overlay"></div>
+<div id="modal-confirm">
+    <div style="font-size: 60px;">✅</div>
+    <h2>¡Pedido Enviado!</h2>
+    <p>Confirma el mensaje en WhatsApp para finalizar.</p>
+    <button onclick="location.reload()" style="padding: 12px 30px; background: linear-gradient(135deg, var(--primary) 0%, #1B5E20 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px;">Aceptar</button>
+</div>
+
+<script>
+    const CELULAR = "573219473080";
+    const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    
+    let menuSemanal = JSON.parse(localStorage.getItem('config_menu_semanal')) || {
+        "Lunes": "Lentejas con Chorizo", "Martes": "Sancocho de Gallina", "Miércoles": "Arroz Atollado",
+        "Jueves": "Ajiaco Santafereño", "Viernes": "Pescado Frito", "Sábado": "Bandeja Paisa"
+    };
+
+    function actualizarVista() {
+        const ahora = new Date();
+        let index = (ahora.getHours() >= 21) ? (ahora.getDay() + 1) % 7 : ahora.getDay();
+        const plato = menuSemanal[dias[index]] || "Cerrado";
+        document.getElementById('nombre-menu-dia').innerText = (ahora.getHours() >= 21 ? "🌅 Mañana: " : "🍲 Hoy: ") + plato;
+        
+        let html = "<ul>";
+        for (let d in menuSemanal) { if(d!=="Domingo") html += `<li><strong>${d}:</strong> ${menuSemanal[d]}</li>`; }
+        document.getElementById('lista-semanal').innerHTML = html + "</ul>";
+    }
+
+    function toggleMenuSemanal() {
+        const div = document.getElementById('lista-semanal');
+        div.style.display = (div.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function enviarPedido() {
+        const cD = Math.max(0, parseInt(document.getElementById('cant-dia').value) || 0);
+        const cE = Math.max(0, parseInt(document.getElementById('cant-ejecutivo').value) || 0);
+        const dir = document.getElementById('direccion').value.trim();
+        const pago = document.querySelector('input[name="pago"]:checked').value;
+        const nota = document.getElementById('notas').value.trim();
+        
+        if ((cD + cE) === 0) return alert("Elige al menos un plato.");
+        if (!dir) return alert("La dirección es obligatoria.");
+
+        const total = (cD * 18000) + (cE * 20000);
+        
+        let v = JSON.parse(localStorage.getItem('ventas_delivery')) || [];
+        v.push({ f: new Date().toLocaleString(), t: total, dir: dir, pg: pago, cD, cE, nota });
+        localStorage.setItem('ventas_delivery', JSON.stringify(v));
+
+        let msg = `*NUEVO PEDIDO 🍴*%0A------------------%0A`;
+        if(cD > 0) msg += `✅ *Menú Día:* ${cD}%0A`;
+        if(cE > 0) msg += `⭐ *Ejecutivo:* ${cE}%0A`;
+        msg += `------------------%0A💰 *Total:* $${total.toLocaleString()}%0A💳 *Pago:* ${pago}%0A📍 *Dir:* ${dir}%0A`;
+        if(nota) msg += `📝 *Nota:* _${nota}_%0A`;
+
+        window.open(`https://wa.me/${CELULAR}?text=${msg}`, '_blank');
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('modal-confirm').style.display = 'block';
+    }
+
+    function consultarEstado() {
+        const dir = document.getElementById('direccion').value.trim();
+        let msg = `Hola! Quisiera saber el estado de mi pedido 🍲`;
+        if(dir) msg += `%0A📍 *Dirección:* ${dir}`;
+        window.open(`https://wa.me/${CELULAR}?text=${msg}`, '_blank');
+    }
+
+    function accesoAdmin() {
+        if (prompt("🔐 PIN de seguridad:") !== "1234") return alert("PIN incorrecto.");
+        const op = prompt("1. 📊 Reporte de Ventas\n2. 🍽️ Editar Menú\n3. 📥 Descargar Excel\n4. 🗑️ Limpiar Datos");
+        let v = JSON.parse(localStorage.getItem('ventas_delivery')) || [];
+
+        if (op === "1") {
+            let sum = v.reduce((a, b) => a + b.t, 0);
+            alert(`📈 RESUMEN DEL DÍA\n━━━━━━━━━━━━━\nPedidos: ${v.length}\nTotal: $${sum.toLocaleString()}`);
+        } else if (op === "2") {
+            for(let d in menuSemanal) { 
+                if(d!=="Domingo") menuSemanal[d] = prompt(`Menú ${d}:`, menuSemanal[d]) || menuSemanal[d]; 
+            }
+            localStorage.setItem('config_menu_semanal', JSON.stringify(menuSemanal));
+            actualizarVista();
+            alert("✅ Menú actualizado!");
+        } else if (op === "3") {
+            let csv = "Fecha,Total,Direccion,Pago,Nota\n" + v.map(i => `"${i.f}","${i.t}","${i.dir}","${i.pg}","${i.nota||''}"`).join("\n");
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "ventas_" + new Date().toLocaleDateString() + ".csv";
+            link.click();
+        } else if (op === "4") {
+            if(confirm("⚠️ ¿Estás seguro de borrar TODOS los datos?")) {
+                localStorage.removeItem('ventas_delivery');
+                alert("✅ Datos eliminados.");
+            }
+        }
+    }
+
+    window.onload = actualizarVista;
+</script>
 </body>
 </html>
