@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Delivery Food - Pedidos</title>
+    
+    <style>
+        :root { --primary: #2E7D32; --secondary: #FF5722; --bg: #f4f4f9; --whatsapp: #25D366; --status: #0288D1; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 15px; padding-bottom: 100px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        
+        .header { text-align: center; margin-bottom: 25px; }
+        .logo { font-size: 30px; font-weight: bold; color: var(--primary); }
+        
+        .banner-semanal { background: var(--primary); color: white; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; margin-bottom: 15px; }
+        #lista-semanal { display: none; background: #f1f8e9; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px dashed var(--primary); font-size: 14px; }
+        
+        .menu-card { border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; background: #fdfdfd; }
+        .qty-input { width: 60px; padding: 10px; border-radius: 8px; border: 2px solid #ddd; text-align: center; font-size: 18px; }
+
+        .form-group { margin-top: 20px; }
+        .form-group label { font-weight: bold; font-size: 14px; display: block; margin-bottom: 8px; }
+        input[type="text"], textarea { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; }
+        
+        .payment-methods { display: flex; gap: 10px; margin-top: 8px; }
+        .pay-option { flex: 1; }
+        .pay-option input { display: none; }
+        .pay-option label { padding: 12px 5px; background: #f0f0f0; border-radius: 10px; cursor: pointer; display: block; text-align: center; font-size: 13px; border: 2px solid transparent; }
+        .pay-option input:checked + label { background: #e8f5e9; border-color: var(--primary); color: var(--primary); font-weight: bold; }
+
+        /* Botones de Acción */
+        .btn-order { background: var(--secondary); color: white; border: none; width: 100%; padding: 18px; font-size: 19px; border-radius: 12px; cursor: pointer; margin-top: 25px; font-weight: bold; box-shadow: 0 5px 15px rgba(255,87,34,0.3); }
+        
+        /* BOTÓN DE ESTADO DE PEDIDO */
+        .btn-status { background: white; color: var(--status); border: 2px solid var(--status); width: 100%; padding: 14px; font-size: 16px; border-radius: 12px; cursor: pointer; margin-top: 15px; font-weight: bold; transition: 0.3s; }
+        .btn-status:active { background: var(--status); color: white; }
+
+        .btn-support { position: fixed; bottom: 25px; right: 25px; background: var(--whatsapp); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; text-decoration: none; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 100; }
+        #modal-confirm, #overlay { display: none; }
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; }
+        #modal-confirm { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 35px; border-radius: 25px; z-index: 1000; text-align: center; width: 85%; max-width: 350px; }
+        .btn-admin-link { background: none; border: none; color: #bbb; font-size: 12px; margin-top: 40px; cursor: pointer; text-decoration: underline; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="logo">🍴 Delivery Food</div>
+        <div style="color: #666; font-size: 14px;">"Sabor casero directo a tu puerta"</div>
+    </div>
+
+    <div class="banner-semanal" onclick="toggleMenuSemanal()">📅 VER MENÚ DE LA SEMANA</div>
+    <div id="lista-semanal"></div>
+
+    <div class="menu-card">
+        <div class="menu-info">
+            <h3 id="nombre-menu-dia">Cargando...</h3>
+            <p>$18.000 COP</p>
+        </div>
+        <input type="number" id="cant-dia" class="qty-input" value="0" min="0" inputmode="numeric">
+    </div>
+
+    <div class="menu-card">
+        <div class="menu-info">
+            <h3>Menú Ejecutivo Especial</h3>
+            <p>$20.000 COP</p>
+        </div>
+        <input type="number" id="cant-ejecutivo" class="qty-input" value="0" min="0" inputmode="numeric">
+    </div>
+
+    <div class="form-group">
+        <label>📍 Dirección de Entrega:</label>
+        <input type="text" id="direccion" placeholder="Ej: Calle 10 #4-20, Apto 302">
+    </div>
+
+    <div class="form-group">
+        <label>💳 Método de Pago:</label>
+        <div class="payment-methods">
+            <div class="pay-option">
+                <input type="radio" id="p-efe" name="pago" value="Efectivo" checked>
+                <label for="p-efe">💵 Efectivo</label>
+            </div>
+            <div class="pay-option">
+                <input type="radio" id="p-neq" name="pago" value="Nequi">
+                <label for="p-neq">🟣 Nequi</label>
+            </div>
+            <div class="pay-option">
+                <input type="radio" id="p-dav" name="pago" value="Daviplata">
+                <label for="p-dav">🔴 Daviplata</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>📝 Notas:</label>
+        <textarea id="notas" rows="2" placeholder="Sin cebolla, cambio de 50k, etc..."></textarea>
+    </div>
+
+    <button class="btn-order" onclick="enviarPedido()">🚀 ORDENAR AHORA</button>
+
+    <button class="btn-status" onclick="consultarEstado()">🔍 ¿Cómo va mi pedido?</button>
+
+    <button class="btn-admin-link" onclick="accesoAdmin()">⚙️ Administración</button>
+</div>
+
+<a href="https://wa.me/573219473080?text=Hola,%20tengo%20una%20pregunta" class="btn-support" target="_blank">💬</a>
+
+<div id="overlay"></div>
+<div id="modal-confirm">
+    <div style="font-size: 50px;">✅</div>
+    <h2>¡Pedido Enviado!</h2>
+    <p>Confirma el mensaje en WhatsApp.</p>
+    <button onclick="location.reload()" style="padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px;">Aceptar</button>
+</div>
+
+<script>
+    const CELULAR = "573219473080";
+    const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    
+    let menuSemanal = JSON.parse(localStorage.getItem('config_menu_semanal')) || {
+        "Lunes": "Lentejas con Chorizo", "Martes": "Sancocho de Gallina", "Miércoles": "Arroz Atollado",
+        "Jueves": "Ajiaco Santafereño", "Viernes": "Pescado Frito", "Sábado": "Bandeja Paisa"
+    };
+
+    function actualizarVista() {
+        const ahora = new Date();
+        let index = (ahora.getHours() >= 21) ? (ahora.getDay() + 1) % 7 : ahora.getDay();
+        const plato = menuSemanal[dias[index]] || "Cerrado";
+        document.getElementById('nombre-menu-dia').innerText = (ahora.getHours() >= 21 ? "🌅 Mañana: " : "🍲 Hoy: ") + plato;
+        
+        let html = "<ul>";
+        for (let d in menuSemanal) { if(d!=="Domingo") html += `<li><strong>${d}:</strong> ${menuSemanal[d]}</li>`; }
+        document.getElementById('lista-semanal').innerHTML = html + "</ul>";
+    }
+
+    function toggleMenuSemanal() {
+        const div = document.getElementById('lista-semanal');
+        div.style.display = (div.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function enviarPedido() {
+        const cD = Math.max(0, parseInt(document.getElementById('cant-dia').value) || 0);
+        const cE = Math.max(0, parseInt(document.getElementById('cant-ejecutivo').value) || 0);
+        const dir = document.getElementById('direccion').value.trim();
+        const pago = document.querySelector('input[name="pago"]:checked').value;
+        const nota = document.getElementById('notas').value.trim();
+        
+        if ((cD + cE) === 0) return alert("Elige un plato.");
+        if (!dir) return alert("Escribe tu dirección.");
+
+        const total = (cD * 18000) + (cE * 20000);
+        
+        // Guardar venta
+        let v = JSON.parse(localStorage.getItem('ventas_delivery')) || [];
+        v.push({ f: new Date().toLocaleString(), t: total, dir: dir, pg: pago, cD, cE });
+        localStorage.setItem('ventas_delivery', JSON.stringify(v));
+
+        let msg = `*NUEVO PEDIDO*%0A------------------%0A`;
+        if(cD > 0) msg += `✅ *Menú Día:* ${cD}%0A`;
+        if(cE > 0) msg += `⭐ *Ejecutivo:* ${cE}%0A`;
+        msg += `💰 *Total:* $${total.toLocaleString()}%0A💳 *Pago:* ${pago}%0A📍 *Dir:* ${dir}%0A📝 *Nota:* ${nota}`;
+
+        window.open(`https://wa.me/${CELULAR}?text=${msg}`, '_blank');
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('modal-confirm').style.display = 'block';
+    }
+
+    // NUEVA FUNCIÓN: CONSULTAR ESTADO
+    function consultarEstado() {
+        const dir = document.getElementById('direccion').value.trim();
+        let msg = `Hola! Quisiera saber el estado de mi pedido 🍲.`;
+        if(dir) msg += `%0A📍 *Dirección:* ${dir}`;
+        
+        window.open(`https://wa.me/${CELULAR}?text=${msg}`, '_blank');
+    }
+
+    function accesoAdmin() {
+        if (prompt("PIN:") !== "1234") return alert("Error.");
+        const op = prompt("1. Ventas\n2. Menú\n3. Descargar CSV\n4. Borrar");
+        let v = JSON.parse(localStorage.getItem('ventas_delivery')) || [];
+
+        if (op === "1") {
+            let sum = v.reduce((a, b) => a + b.t, 0);
+            alert(`Total: $${sum.toLocaleString()}\nPedidos: ${v.length}`);
+        } else if (op === "2") {
+            for(let d in menuSemanal) { if(d!=="Domingo") menuSemanal[d] = prompt(`Menú ${d}:`, menuSemanal[d]) || menuSemanal[d]; }
+            localStorage.setItem('config_menu_semanal', JSON.stringify(menuSemanal));
+            actualizarVista();
+        } else if (op === "3") {
+            let csv = "Fecha,Total,Direccion,Pago\n" + v.map(i => `${i.f},${i.t},${i.dir},${i.pg}`).join("\n");
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "ventas.csv";
+            a.click();
+        } else if (op === "4") {
+            if(confirm("¿Borrar todo?")) localStorage.removeItem('ventas_delivery');
+        }
+    }
+
+    window.onload = actualizarVista;
+</script>
+</body>
+</html>
