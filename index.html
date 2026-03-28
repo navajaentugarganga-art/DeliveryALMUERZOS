@@ -1,0 +1,50 @@
+// Añadimos precios configurables (se guardan en LocalStorage)
+let precios = JSON.parse(localStorage.getItem('config_precios')) || {
+    dia: 18000,
+    ejecutivo: 20000
+};
+
+function actualizarVista() {
+    // ... (Tu lógica de fecha y menú semanal)
+    
+    // Actualizar los textos de precios en la interfaz de usuario
+    document.querySelectorAll('.menu-info p')[0].innerText = `$${precios.dia.toLocaleString()} COP`;
+    document.querySelectorAll('.menu-info p')[1].innerText = `$${precios.ejecutivo.toLocaleString()} COP`;
+    calcularTotal();
+}
+
+function calcularTotal() {
+    const cD = Math.max(0, parseInt(document.getElementById('cant-dia').value) || 0);
+    const cE = Math.max(0, parseInt(document.getElementById('cant-ejecutivo').value) || 0);
+    const total = (cD * precios.dia) + (cE * precios.ejecutivo);
+    document.getElementById('resumen-total').innerText = `Total: $${total.toLocaleString('es-CO')}`;
+    return total;
+}
+
+// Dentro de cargarDatosAdmin(), añade estos campos:
+function cargarDatosAdmin() {
+    // ... (Lo anterior de ventas y menú)
+
+    // Añadir inputs para cambiar precios en el Panel Admin
+    const contenedorMenu = document.getElementById('inputs-menu');
+    contenedorMenu.innerHTML += `
+        <hr>
+        <h3>💰 Editar Precios</h3>
+        <label>Precio Menú Día:</label>
+        <input type="number" class="input-admin" id="price-dia" value="${precios.dia}">
+        <label>Precio Ejecutivo:</label>
+        <input type="number" class="input-admin" id="price-ejecutivo" value="${precios.ejecutivo}">
+    `;
+}
+
+function guardarNuevoMenu() {
+    // ... (Guardar platos del menú)
+    
+    // Guardar nuevos precios
+    precios.dia = parseInt(document.getElementById('price-dia').value);
+    precios.ejecutivo = parseInt(document.getElementById('price-ejecutivo').value);
+    localStorage.setItem('config_precios', JSON.stringify(precios));
+    
+    actualizarVista();
+    alert("✅ Datos actualizados.");
+}
